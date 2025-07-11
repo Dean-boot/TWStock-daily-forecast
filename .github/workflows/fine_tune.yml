@@ -1,0 +1,30 @@
+name: fine_tune
+
+on:
+  workflow_dispatch:     # ✅ 手動觸發
+  schedule:
+    - cron: '0 19 * * *' # 每天 03:00 台灣時間（UTC+8）
+
+jobs:
+  run-finetune:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install openai
+
+    - name: Generate training data
+      run: python scripts/generate_data.py
+
+    - name: Run fine-tune
+      run: python scripts/start_finetune.py
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
